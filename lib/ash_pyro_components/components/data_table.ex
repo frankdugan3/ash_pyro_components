@@ -5,7 +5,7 @@ defmodule AshPyroComponents.Components.DataTable do
 
   use AshPyroComponents.Component
 
-  import PyroComponents.DataTable, only: [data_table: 1]
+  import PyroComponents.Components.DataTable, only: [data_table: 1]
 
   @doc """
   Renders a data table.

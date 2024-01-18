@@ -6,7 +6,7 @@ defmodule AshPyroComponents.Components.Form do
   use AshPyroComponents.Component
 
   # import Pyro.Gettext
-  import PyroComponents.Core, only: [button: 1, header: 1, input: 1]
+  import PyroComponents.Components.Core, only: [button: 1, header: 1, input: 1]
 
   alias Ash.Resource.Info, as: ResourceInfo
   alias AshPyro.Extensions.Resource.Info, as: PI
@@ -334,7 +334,7 @@ defmodule AshPyroComponents.Components.Form do
 
     ~H"""
     <.live_component
-      module={PyroComponents.Autocomplete}
+      module={PyroComponents.Components.Autocomplete}
       id={"#{@form.id}-#{@field.name}-autocomplete"}
       overrides={@overrides}
       field={@form[@field.name]}

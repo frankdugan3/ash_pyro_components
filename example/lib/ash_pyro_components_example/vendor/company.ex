@@ -43,7 +43,7 @@ defmodule AshPyroComponentsExample.Vendor.Company do
           render_cell fn assigns ->
             ~H"""
             <%= Map.get(@row, @col[:name]) %>
-            <PyroComponents.Core.icon name="hero-rocket-launch-micro" />
+            <PyroComponents.Components.Core.icon name="hero-rocket-launch-micro" />
             """
           end
         end

@@ -93,7 +93,7 @@ defmodule AshPyroComponents.Components.Page do
 
         alias Ash.Resource.Info, as: RI
         alias AshPyro.Extensions.Resource.Info, as: PI
-        alias PyroComponents.DataTable
+        alias PyroComponents.Components.DataTable
 
         require Ash.Query
 
@@ -214,7 +214,7 @@ defmodule AshPyroComponents.Components.Page do
                   Map.put(
                     stored_component_params,
                     "sort",
-                    PyroComponents.DataTable.encode_sort(sort_params)
+                    PyroComponents.Components.DataTable.encode_sort(sort_params)
                   )
                 )
 
@@ -233,7 +233,7 @@ defmodule AshPyroComponents.Components.Page do
                 Map.put(
                   socket.assigns.params,
                   unquote(list_component_id),
-                  PyroComponents.DataTable.encode_sort(list_sort)
+                  PyroComponents.Components.DataTable.encode_sort(list_sort)
                 )
 
               socket
@@ -279,7 +279,7 @@ defmodule AshPyroComponents.Components.Page do
                 Map.put(
                   stored_component_params,
                   "display",
-                  PyroComponents.DataTable.encode_display(list_display)
+                  PyroComponents.Components.DataTable.encode_display(list_display)
                 )
               )
 
