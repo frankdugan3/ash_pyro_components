@@ -16,8 +16,8 @@ These steps assume you are adding AshPyroComponents to an existing Phoenix LiveV
    def deps do
      [
     {:ash_postgres, "~> 1.0"},
-    {:ash_pyro_components, "~> 0.0.0"},
-    {:ash_pyro, "~> 0.0.0"},
+    {:ash_pyro_components, "~> 0.0.1"},
+    {:ash_pyro, "~> 0.0.1"},
     {:ash, "~> 2.4"},
     {:pyro, "~> 0.2.0"},
 

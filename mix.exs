@@ -3,7 +3,7 @@ defmodule AshPyroComponents.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/frankdugan3/ash_pyro_components"
-  @version "0.0.0"
+  @version "0.0.1"
   @description """
   Automatically render UI for Ash resources via DSL configuration.
   """

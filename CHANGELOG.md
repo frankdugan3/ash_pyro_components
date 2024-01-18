@@ -5,6 +5,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.0.1](https://github.com/frankdugan3/ash_pyro_components/compare/v0.0.0...v0.0.1) (2024-01-18)
+
+
+
+
 ## [v0.0.0](https://github.com/frankdugan3/ash_pyro_components/compare/v0.0.0...v0.0.0) (2024-01-18)
 
 
