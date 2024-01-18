@@ -1,0 +1,21 @@
+<header class="px-4">
+  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+    <div class="flex items-center gap-4">
+      <p class="font-black text-lg">AshPyroComponentsExample</p>
+      <p class="bg-slate-900/5 text-slate-900 dark:bg-slate-100/5 dark:text-slate-100 rounded-full px-2 font-medium leading-6">
+        AshPyroComponents v<%= Application.spec(:ash_pyro_components, :vsn) %>
+      </p>
+    </div>
+    <div class="flex items-center gap-2 font-semibold leading-6">
+      <.color_scheme_switcher />
+      <.a target="_blank" href="https://github.com/frankdugan3/ash_pyro_components">GitHub</.a>
+      <.button target="_blank" href="https://hexdocs.pm/ash_pyro_components/get-started.html">
+        Get Started <span aria-hidden="true">&rarr;</span>
+      </.button>
+    </div>
+  </div>
+</header>
+<main class="grid overflow-auto px-4 pb-4 content-start">
+  <.flash_group flash={@flash} />
+  <%= @inner_content %>
+</main>
