@@ -116,6 +116,7 @@ defmodule AshPyroComponents.Components.Page do
             sort={@list_sort}
             display={@list_display}
             filter={@list_filter}
+            page={@list_pagination}
             rows={@records}
             actor={@current_user}
             tz={@tz}
@@ -153,11 +154,12 @@ defmodule AshPyroComponents.Components.Page do
            |> validate_sort_params(new_params)
            |> validate_filter_params(new_params)
            |> validate_display_params(new_params)
+           |> validate_page_params(new_params)
            |> maybe_patch_params(new_params)}
         end
 
         @impl true
-        def handle_event("reset-table", %{"component-id" => unquote(list_component_id)}, socket) do
+        def handle_event("reset-list", %{"target-id" => unquote(list_component_id)}, socket) do
           handle_params(%{}, "", assign(socket, :params, %{unquote(list_component_id) => %{}}))
         end
 
@@ -184,6 +186,43 @@ defmodule AshPyroComponents.Components.Page do
             )
 
           component_params = Map.put(component_params, "sort", sort)
+
+          params =
+            Map.put(socket.assigns.params, unquote(list_component_id), component_params)
+
+          {:noreply,
+           socket
+           |> assign(:params, params)
+           |> maybe_patch_params(socket.assigns.params)}
+        end
+
+        @impl true
+        def handle_event("change-page-number", %{"target-id" => unquote(list_component_id), "offset" => offset}, socket) do
+          component_params =
+            get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+          component_params = Map.put(component_params, "offset", offset)
+
+          params =
+            Map.put(socket.assigns.params, unquote(list_component_id), component_params)
+
+          {:noreply,
+           socket
+           |> assign(:params, params)
+           |> maybe_patch_params(socket.assigns.params)}
+        end
+
+        @impl true
+        def handle_event(
+              "change-page-limit",
+              %{"pagination_form" => %{"target-id" => unquote(list_component_id), "limit" => limit}},
+              socket
+            ) do
+          component_params =
+            get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+          component_params =
+            Map.put(component_params, "limit", "#{limit}")
 
           params =
             Map.put(socket.assigns.params, unquote(list_component_id), component_params)
@@ -250,15 +289,24 @@ defmodule AshPyroComponents.Components.Page do
             get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
 
           display_params =
-            Map.get(get_nested(params, [unquote(list_component_id)], %{}), "display", "")
+            get_nested(params, [unquote(list_component_id), "display"], "")
 
           display_fields = String.split(display_params, ",", trim: true)
+
+          sorts =
+            Enum.map(Map.get(socket.assigns, :list_sort, []) || [], fn {key, _} ->
+              Atom.to_string(key)
+            end)
+
+          # Ensure all applied sorts are visible
+          missing_sorts = sorts -- display_fields
+          display_fields = Enum.concat(missing_sorts, display_fields)
+          display_params = Enum.join(display_fields, ",")
 
           known_fields =
             Enum.map(socket.assigns.data_table_config.columns, &Atom.to_string(&1.name))
 
           if length(display_fields) > 0 && Enum.all?(display_fields, &(&1 in known_fields)) do
-            # TODO: Add any missing sorted fields
             params =
               Map.put(
                 socket.assigns.params,
@@ -289,6 +337,56 @@ defmodule AshPyroComponents.Components.Page do
           end
         end
 
+        defp validate_page_params(
+               %{assigns: %{live_action_config: %Page.List{pagination: :offset, default_limit: default_limit}}} = socket,
+               params
+             ) do
+          stored_component_params =
+            get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+          offset =
+            case Integer.parse(get_nested(params, [unquote(list_component_id), "offset"], "0")) do
+              {value, _} -> value
+              _ -> 0
+            end
+
+          limit =
+            case Integer.parse(get_nested(params, [unquote(list_component_id), "limit"], "")) do
+              {value, _} -> value
+              _ -> default_limit
+            end
+
+          params =
+            Map.put(
+              socket.assigns.params,
+              unquote(list_component_id),
+              stored_component_params
+              |> Map.drop(["after", "before"])
+              |> Map.put("offset", Integer.to_string(offset))
+              |> Map.put("limit", Integer.to_string(limit))
+            )
+
+          socket
+          |> assign(:params, params)
+          |> assign(:list_pagination, %{offset: offset, limit: limit})
+        end
+
+        defp validate_page_params(socket, _params) do
+          stored_component_params =
+            get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+          params =
+            Map.put(
+              socket.assigns.params,
+              unquote(list_component_id),
+              Map.drop(stored_component_params, ["limit", "offset", "after", "before"])
+            )
+
+          socket
+          |> assign(:params, params)
+          |> assign(:list_pagination, nil)
+        end
+
         defp maybe_patch_params(%{assigns: %{params: valid_params}} = socket, params) when valid_params == params do
           {attributes, fields} =
             socket.assigns.data_table_config.columns
@@ -301,17 +399,45 @@ defmodule AshPyroComponents.Components.Page do
             |> Ash.Query.select(Enum.map(attributes, & &1.name))
             |> Ash.Query.load(Enum.map(fields, & &1.name))
 
-          assign(
-            socket,
-            :records,
-            apply(unquote(pyro_page.api), :read!, [
-              query,
-              [
-                actor: socket.assigns.current_user,
-                action: socket.assigns.list_action
-              ]
-            ])
-          )
+          page =
+            case socket.assigns.list_pagination do
+              %{} = page ->
+                page
+                |> Keyword.new()
+                |> Keyword.put(:count, socket.assigns.live_action_config.count?)
+
+              _ ->
+                nil
+            end
+
+          case apply(unquote(pyro_page.api), :read!, [
+                 query,
+                 [
+                   actor: socket.assigns.current_user,
+                   action: socket.assigns.list_action,
+                   page: page || nil
+                 ]
+               ]) do
+            %{results: records, count: count, more?: more?} ->
+              socket
+              |> assign(
+                :records,
+                records
+              )
+              |> assign(
+                :list_pagination,
+                socket.assigns.list_pagination
+                |> Map.put(:count, count)
+                |> Map.put(:more?, more?)
+              )
+
+            records ->
+              assign(
+                socket,
+                :records,
+                records
+              )
+          end
         end
 
         defp maybe_patch_params(%{assigns: %{params: valid_params, live_action: live_action}} = socket, _params),
@@ -343,6 +469,13 @@ defmodule AshPyroComponents.Components.Page do
       defp handle_action(%{assigns: %{live_action: unquote(live_action), current_user: actor}} = socket) do
         socket
         |> assign(:data_table_config, PI.data_table_for!(@resource, unquote(action)))
+        |> assign(
+          :live_action_config,
+          Enum.find(
+            socket.assigns.pyro_page.live_actions,
+            &(&1.live_action == unquote(live_action))
+          )
+        )
         |> assign(
           :return_to,
           apply(unquote(routes), unquote(route_helper), [socket, unquote(live_action)])

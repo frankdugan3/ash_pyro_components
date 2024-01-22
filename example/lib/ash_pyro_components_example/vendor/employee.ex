@@ -73,7 +73,17 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
   end
 
   actions do
-    defaults [:read, :destroy]
+    defaults [:destroy]
+
+    read :read do
+      primary? true
+      pagination do
+        countable true
+        max_page_size 100
+        required? true
+        offset? true
+      end
+    end
 
     create :create do
       argument :employer, :map, allow_nil?: false

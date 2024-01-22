@@ -18,6 +18,7 @@ defmodule AshPyroComponents.Components.DataTable do
   attr :sort, :list, required: true
   attr :display, :list, required: true
   attr :filter, :list, required: true
+  attr :page, :list, required: true
   attr :resource, :atom, required: true, doc: "the resource of the data table"
   attr :actor, :map, default: nil, doc: "the actor to be passed to actions"
   attr :tz, :string, default: "Etc/UTC", doc: "timezone"
@@ -27,7 +28,7 @@ defmodule AshPyroComponents.Components.DataTable do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <.data_table id={@id} rows={@rows} sort={@sort} class={ash_class(@class, assigns)}>
+    <.data_table id={@id} rows={@rows} sort={@sort} page={@page} class={ash_class(@class, assigns)}>
       <:col
         :let={row}
         :for={col <- display_columns(@config.columns, @display)}

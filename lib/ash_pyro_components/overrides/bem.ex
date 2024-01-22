@@ -19,41 +19,41 @@ defmodule AshPyroComponents.Overrides.BEM do
 
   use Pyro.Overrides
 
-  @prefix Application.compile_env(:pyro_components, :bem_prefix, "")
+  @prefix Application.compile_env(:pyro_components, :bem_prefix, "pyro_")
 
   ##############################################################################
   ####    A S H    C O M P O N E N T S
   ##############################################################################
 
-  @prefixed_smart_data_table @prefix <> "smart_data_table"
-  override AshPyroComponents.Components.DataTable, :smart_data_table do
-    set :class, &__MODULE__.smart_data_table_class/1
+  @prefixed_ash_data_table @prefix <> "ash_data_table"
+  override AshPyroComponents.Components.DataTable, :ash_data_table do
+    set :class, &__MODULE__.ash_data_table_class/1
   end
 
-  def smart_data_table_class(passed_assigns) do
-    [@prefixed_smart_data_table, get_nested(passed_assigns, [:pyro_data_table, :class])]
+  def ash_data_table_class(passed_assigns) do
+    [@prefixed_ash_data_table, get_nested(passed_assigns, [:pyro_data_table, :class])]
   end
 
-  @prefixed_smart_form @prefix <> "smart_form"
-  override AshPyroComponents.Components.Form, :smart_form do
-    set :class, &__MODULE__.smart_form_class/1
-    set :actions_class, @prefixed_smart_form <> "__actions"
+  @prefixed_ash_form @prefix <> "ash_form"
+  override AshPyroComponents.Components.Form, :ash_form do
+    set :class, &__MODULE__.ash_form_class/1
+    set :actions_class, @prefixed_ash_form <> "__actions"
     set :autocomplete, "off"
   end
 
-  def smart_form_class(passed_assigns) do
-    [@prefixed_smart_form, get_nested(passed_assigns, [:pyro_form, :class])]
+  def ash_form_class(passed_assigns) do
+    [@prefixed_ash_form, get_nested(passed_assigns, [:pyro_form, :class])]
   end
 
-  @prefixed_smart_form_render_field @prefix <> "smart_form_render_field"
+  @prefixed_ash_form_render_field @prefix <> "ash_form_render_field"
   override AshPyroComponents.Components.Form, :render_field do
-    set :field_group_class, &__MODULE__.smart_form_field_group_class/1
-    set :field_group_label_class, @prefixed_smart_form_render_field("__group_label")
+    set :field_group_class, &__MODULE__.ash_form_field_group_class/1
+    set :field_group_label_class, @prefixed_ash_form_render_field <> "__group_label"
   end
 
-  def smart_form_field_group_class(passed_assigns) do
+  def ash_form_field_group_class(passed_assigns) do
     [
-      @prefixed_smart_form_render_field <> "__group",
+      @prefixed_ash_form_render_field <> "__group",
       get_nested(passed_assigns, [:field, :class])
     ]
   end

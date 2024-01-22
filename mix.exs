@@ -78,8 +78,8 @@ defmodule AshPyroComponents.MixProject do
       licenses: ["MIT"],
       links: %{GitHub: @source_url},
       files:
-        ~w(lib documentation) ++
-          ~w(README* CHANGELOG* LICENSE* mix.exs .formatter.exs)
+        ~w(assets lib documentation) ++
+          ~w(README* CHANGELOG* LICENSE* mix.exs package.json .formatter.exs)
     ]
   end
 
@@ -124,13 +124,16 @@ defmodule AshPyroComponents.MixProject do
       {:git_ops, "~> 2.6", only: :dev},
       # Core dependencies
       {:pyro, "~> 0.3"},
-      {:ash_pyro, "~> 0.0"},
-      {:pyro_components, "~> 0.0"},
+      # {:ash_pyro, "~> 0.0"},
+      # {:pyro_components, "~> 0.0"},
       # {:pyro_components, github: "frankdugan3/pyro_components", branch: "main"},
       # {:ash_pyro, github: "frankdugan3/ash_pyro", branch: "main"},
+      {:pyro_components, path: "../pyro_components"},
+      {:ash_pyro, path: "../ash_pyro"},
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
-      {:ash, "~> 2.4", optional: true},
+      # {:ash, "~> 2.4"},
+      {:ash, github: "ash-project/ash", branch: "main", override: true},
       {:gettext, "~> 0.24", optional: true}
     ]
   end

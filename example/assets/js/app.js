@@ -2,7 +2,12 @@ import 'phoenix_html'
 import { Socket } from 'phoenix'
 import { LiveSocket } from 'phoenix_live_view'
 import topbar from '../vendor/topbar'
-import { hooks, getTimezone, sendTimezoneToServer } from 'pyro_components'
+import {
+  hooks as pyro_components_hooks,
+  getTimezone,
+  sendTimezoneToServer,
+} from 'pyro_components'
+import { hooks as ash_pyro_components_hooks } from 'ash_pyro_components'
 
 sendTimezoneToServer()
 
@@ -11,7 +16,7 @@ let csrfToken = document
   .getAttribute('content')
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken, timezone: getTimezone() },
-  hooks: { ...hooks },
+  hooks: { ...pyro_components_hooks, ...ash_pyro_components_hooks },
   metadata: {
     click: (e, el) => {
       return {

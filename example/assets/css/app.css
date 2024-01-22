@@ -1,4 +1,6 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
-@import '../../deps/pyro_components/assets/css/bem.css';
+/* @import '../../deps/pyro_components/assets/css/bem.css'; */
+@import '../../../../pyro_components/assets/css/bem.css';
+@import '../../../assets/css/bem.css';
 @import 'tailwindcss/utilities';

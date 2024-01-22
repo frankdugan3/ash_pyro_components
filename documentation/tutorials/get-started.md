@@ -69,40 +69,40 @@ These steps assume you are adding AshPyroComponents to an existing Phoenix LiveV
 4. Configure your `tailwind.config.js` according to this example:
 
    ```js
-   const path = require("path");
+   const path = require('path')
 
    module.exports = {
      // Dark mode support
-     darkMode: "class",
+     darkMode: 'class',
      content: [
        // The usual defaults
-       "./js/**/*.js",
-       "../lib/my_app_web.ex",
-       "../lib/my_app_web/**/*.*ex",
+       './js/**/*.js',
+       '../lib/my_app_web.ex',
+       '../lib/my_app_web/**/*.*ex',
 
        // Add the directory you will be keeping resources since
        // we need to include any classes referenced in the UI DSL
-       "../lib/my_app/**/*.ex",
+       '../lib/my_app/**/*.ex',
 
        // Add your chosen Pyro overrides file(s)
-       "../deps/pyro_components/lib/pyro_components/overrides/bem.ex",
-       "../deps/ash_pyro_components/lib/ash_pyro_components/overrides/bem.ex",
+       '../deps/pyro_components/lib/pyro_components/overrides/bem.ex',
+       '../deps/ash_pyro_components/lib/ash_pyro_components/overrides/bem.ex',
      ],
      plugins: [
        // Pyro expects the forms plugin
-       require("@tailwindcss/forms"),
+       require('@tailwindcss/forms'),
        // Add Pyro's Tailwind plugin
        require(path.join(
          __dirname,
-         "../deps/pyro/assets/js/tailwind-plugin.js"
+         '../deps/pyro/assets/js/tailwind-plugin.js',
        ))({
-         heroIconsPath: path.join(__dirname, "../deps/heroicons/optimized"),
+         heroIconsPath: path.join(__dirname, '../deps/heroicons/optimized'),
          addBase: true,
        }),
 
        // Pyro replaces Phoenix's generated plugin stuff, you can delete it!
      ],
-   };
+   }
    ```
 
    > #### Note: {: .warning}
@@ -112,13 +112,24 @@ These steps assume you are adding AshPyroComponents to an existing Phoenix LiveV
 5. Add the following lines to `assets/js/app.js`:
 
    ```js
-   import { hooks, getTimezone } from "pyro";
+   import { hooks as pyro_components_hooks, getTimezone } from 'pyro_components'
+   import { hooks as ash_pyro_components_hooks } from 'ash_pyro_components'
 
-   let liveSocket = new LiveSocket("/live", Socket, {
+   let liveSocket = new LiveSocket('/live', Socket, {
      params: { _csrf_token: csrfToken, timezone: getTimezone() },
-     hooks: { ...hooks },
-   });
+     hooks: { ...pyro_components_hooks, ...ash_pyro_components_hooks },
+   })
    ```
+
+6. Edit your `assets/css.app.css` file to import the default styles:
+
+```css
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import '../../deps/pyro_components/assets/css/bem.css';
+@import '../../deps/ash_pyro_components/assets/css/bem.css';
+@import 'tailwindcss/utilities';
+```
 
 6. Edit your `my_app_web.ex` file, replacing:
 

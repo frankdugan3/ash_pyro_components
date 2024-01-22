@@ -22,7 +22,7 @@ config :ash_pyro_components_example, AshPyroComponentsExample.Repo,
 config :ash_pyro_components_example, AshPyroComponentsExampleWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 9001],
+  http: [ip: {127, 0, 0, 1}, port: 9002],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,

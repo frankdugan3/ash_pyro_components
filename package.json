@@ -1,0 +1,19 @@
+{
+  "name": "ash_pyro_components",
+  "description": "Supporting utilities for AshPyroComponents.",
+  "license": "MIT",
+  "exports": {
+    ".": "./assets/js/components.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/frankdugan3/ash_pyro_components.git"
+  },
+  "author": "Frank Dugan III <frank3@duganator.com> (https://frankdugan.com)",
+  "files": [
+    "README.md",
+    "LICENSE.md",
+    "package.json",
+    "assets/*"
+  ]
+}
