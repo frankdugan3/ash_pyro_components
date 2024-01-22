@@ -9,7 +9,7 @@ defmodule AshPyroComponents.LiveView do
       quote do
         import Phoenix.LiveView
       end,
-      quote do
+      quote bind_quoted: [opts: opts] do
         @behaviour Phoenix.LiveView
         @before_compile Phoenix.LiveView.Renderer
 
