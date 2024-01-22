@@ -5,16 +5,21 @@ defmodule AshPyroComponents.LiveComponent do
 
   @doc false
   defmacro __using__(opts \\ []) do
-    quote do
-      import Phoenix.LiveView
-      @behaviour Phoenix.LiveComponent
-      @before_compile Phoenix.LiveView.Renderer
+    [
+      quote do
+        import Phoenix.LiveView
+      end,
+      quote do
+        @behaviour Phoenix.LiveComponent
+        @before_compile Phoenix.LiveView.Renderer
+      end,
+      quote do
+        # AshPyroComponents.Component must come last so its @before_compile runs last
+        use AshPyroComponents.Component, Keyword.take(unquote(opts), [:global_prefixes])
 
-      # AshPyroComponents.Component must come last so its @before_compile runs last
-      use AshPyroComponents.Component, Keyword.take(unquote(opts), [:global_prefixes])
-
-      @doc false
-      def __live__, do: %{kind: :component, layout: false}
-    end
+        @doc false
+        def __live__, do: %{kind: :component, layout: false}
+      end
+    ]
   end
 end
