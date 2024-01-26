@@ -18,7 +18,7 @@ defmodule AshPyroComponents.LiveComponent do
         use AshPyroComponents.Component, Keyword.take(unquote(opts), [:global_prefixes])
 
         @doc false
-        def __live__, do: %{kind: :component, layout: false}
+        def __live__, do: %{kind: :component, module: __MODULE__, layout: false}
       end
     ]
   end
