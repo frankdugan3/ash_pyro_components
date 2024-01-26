@@ -57,13 +57,26 @@ config :ash_pyro_components_example, AshPyroComponentsExampleWeb.Endpoint,
 
 # Watch static and templates for browser reloading.
 config :ash_pyro_components_example, AshPyroComponentsExampleWeb.Endpoint,
+  reloadable_apps: [:ash_pyro_components, :ash_pyro_components_example],
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/example/.*ex$",
-      ~r"lib/example_web/(controllers|live|components)/.*(ex|heex)$"
-    ]
+      ~r"lib/example_web/(controllers|live|components)/.*(ex|heex)$",
+      ~r"lib/ash_pyro_components/.*(ex|heex)$",
+    ],
+  ]
+
+  root_path =
+    __ENV__.file
+    |> Path.dirname()
+    |> Path.join("../..")
+    |> Path.expand()
+
+  config :phoenix_live_reload, :dirs, [
+    root_path,
+    Path.join([root_path, "example"]),
   ]
 
 # Enable dev routes for dashboard and mailbox

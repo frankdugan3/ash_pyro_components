@@ -3,6 +3,8 @@ alias Ash.Api.Info, as: ApiInfo
 alias Ash.Policy.Info, as: PolicyInfo
 alias Ash.Resource.Info, as: ResourceInfo
 alias AshPyro.Extensions.Resource.Info, as: PI
+alias AshPyroComponentsExample.Vendor.Company
+alias AshPyroComponentsExample.Vendor.Employee
 
 if function_exported?(Mix, :__info__, 1) and Mix.env() == :dev do
   Logger.configure_backend(:console, device: Process.group_leader())
