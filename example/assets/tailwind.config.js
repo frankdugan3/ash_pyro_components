@@ -1,7 +1,7 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   darkMode: 'class',
@@ -13,6 +13,7 @@ module.exports = {
     // '../../deps/pyro_components/lib/pyro_components/overrides/bem.ex',
     '../../../pyro_components/lib/pyro_components/overrides/bem.ex',
     '../../lib/ash_pyro_components/overrides/bem.ex',
+    '../../lib/ash_pyro_components/components/filter_form.ex',
   ],
   plugins: [
     require('@tailwindcss/forms'),
@@ -25,4 +26,4 @@ module.exports = {
       addBase: true,
     }),
   ],
-}
+};

@@ -1,19 +1,19 @@
-import 'phoenix_html'
-import { Socket } from 'phoenix'
-import { LiveSocket } from 'phoenix_live_view'
-import topbar from '../vendor/topbar'
+import 'phoenix_html';
+import { Socket } from 'phoenix';
+import { LiveSocket } from 'phoenix_live_view';
+import topbar from '../vendor/topbar';
 import {
   hooks as pyro_components_hooks,
   getTimezone,
   sendTimezoneToServer,
-} from 'pyro_components'
-import { hooks as ash_pyro_components_hooks } from 'ash_pyro_components'
+} from 'pyro_components';
+import { hooks as ash_pyro_components_hooks } from 'ash_pyro_components';
 
-sendTimezoneToServer()
+sendTimezoneToServer();
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
-  .getAttribute('content')
+  .getAttribute('content');
 let liveSocket = new LiveSocket('/live', Socket, {
   params: { _csrf_token: csrfToken, timezone: getTimezone() },
   hooks: { ...pyro_components_hooks, ...ash_pyro_components_hooks },
@@ -23,7 +23,7 @@ let liveSocket = new LiveSocket('/live', Socket, {
         shiftKey: e.shiftKey,
         ctrlKey: e.ctrlKey,
         // detail: e.detail || 1,
-      }
+      };
     },
     // keydown: (e, el) => {
     //   return {
@@ -44,21 +44,21 @@ let liveSocket = new LiveSocket('/live', Socket, {
     //   }
     // },
   },
-})
+});
 
 // Show progress bar on live navigation and form submits
-topbar.config({ barColors: { 0: '#29d' }, shadowColor: 'rgba(0, 0, 0, .3)' })
-window.addEventListener('phx:page-loading-start', (_info) => topbar.show(300))
-window.addEventListener('phx:page-loading-stop', (_info) => topbar.hide())
+topbar.config({ barColors: { 0: '#29d' }, shadowColor: 'rgba(0, 0, 0, .3)' });
+window.addEventListener('phx:page-loading-start', (_info) => topbar.show(300));
+window.addEventListener('phx:page-loading-stop', (_info) => topbar.hide());
 
 // connect if there are any LiveViews on the page
-liveSocket.connect()
+liveSocket.connect();
 
 if (process.env.NODE_ENV !== 'production') {
-  liveSocket.enableDebug()
-  window.liveSocket = liveSocket
+  liveSocket.enableDebug();
+  window.liveSocket = liveSocket;
 }
 
 console.log(`What, you think you're some kind of developer? Get out of my space!!
 
-(╯°□°）╯︵ ┻━┻`)
+(╯°□°）╯︵ ┻━┻`);
