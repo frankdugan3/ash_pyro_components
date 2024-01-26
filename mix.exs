@@ -133,6 +133,7 @@ defmodule AshPyroComponents.MixProject do
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
       {:ash, "~> 2.4"},
+      {:ash_phoenix, "~> 1.3"},
       {:gettext, "~> 0.24", optional: true}
     ]
   end

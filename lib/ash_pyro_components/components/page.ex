@@ -82,7 +82,7 @@ defmodule AshPyroComponents.Components.Page do
       raise "page (name) is required"
     end
 
-    pyro_page = PI.page_for!(resource, page_name)
+    pyro_page = PI.page_for(resource, page_name)
     list_component_id = "#{pyro_page.name}_list"
 
     live_view =
@@ -100,7 +100,7 @@ defmodule AshPyroComponents.Components.Page do
         Module.register_attribute(__MODULE__, :resource, persist: true)
         Module.register_attribute(__MODULE__, :pyro_page, persist: true)
         @resource unquote(resource)
-        @pyro_page PI.page_for!(@resource, unquote(page_name))
+        @pyro_page PI.page_for(@resource, unquote(page_name))
 
         @impl true
         def render(var!(assigns)) do
@@ -109,6 +109,17 @@ defmodule AshPyroComponents.Components.Page do
             <%= @page_title %>
             <:subtitle><%= @page_description %></:subtitle>
           </.header>
+          <.live_component
+            module={AshFilterForm}
+            id={@list_component_id <> "_filter_form"}
+            resource={@resource}
+            action={@list_action}
+            actor={@current_user}
+            tz={@tz}
+            to_uri={fn params -> route_for(@socket, @live_action, params) end}
+            uri_params={@params}
+            target_id={@list_component_id}
+          />
           <AshPyroComponents.Components.DataTable.ash_data_table
             id={@list_component_id}
             resource={@resource}
@@ -281,8 +292,44 @@ defmodule AshPyroComponents.Components.Page do
           end
         end
 
-        # TODO:Actually validate filter params
-        defp validate_filter_params(socket, _params), do: assign(socket, :list_filter, [])
+        defp validate_filter_params(socket, params) do
+          stored_component_params =
+            get_nested(socket, [:assigns, :params, unquote(list_component_id)], %{})
+
+          {params, list_filter} =
+            with filter_params when is_map(filter_params) <-
+                   get_nested(params, [unquote(list_component_id), "filter"]),
+                 %{valid?: true} = filter_form <-
+                   AshPhoenix.FilterForm.new(socket.assigns.resource, params: filter_params),
+                 {:ok, filter} <- AshPhoenix.FilterForm.to_filter_expression(filter_form) do
+              {Map.put(
+                 socket.assigns.params,
+                 unquote(list_component_id),
+                 Map.put(
+                   stored_component_params,
+                   "filter",
+                   # TODO: re-endcode from validated filter form
+                   filter_params
+                 )
+               ), filter}
+            else
+              _ ->
+                {nil, nil}
+
+                {Map.put(
+                   socket.assigns.params,
+                   unquote(list_component_id),
+                   Map.delete(
+                     stored_component_params,
+                     "filter"
+                   )
+                 ), nil}
+            end
+
+          socket
+          |> assign(:params, params)
+          |> assign(:list_filter, list_filter)
+        end
 
         defp validate_display_params(socket, params) do
           stored_component_params =
@@ -399,6 +446,12 @@ defmodule AshPyroComponents.Components.Page do
             |> Ash.Query.select(Enum.map(attributes, & &1.name))
             |> Ash.Query.load(Enum.map(fields, & &1.name))
 
+          query =
+            case socket.assigns.list_filter do
+              nil -> query
+              filter -> Ash.Query.filter(query, ^socket.assigns.list_filter)
+            end
+
           page =
             case socket.assigns.list_pagination do
               %{} = page ->
@@ -468,7 +521,7 @@ defmodule AshPyroComponents.Components.Page do
       @doc false
       defp handle_action(%{assigns: %{live_action: unquote(live_action), current_user: actor}} = socket) do
         socket
-        |> assign(:data_table_config, PI.data_table_for!(@resource, unquote(action)))
+        |> assign(:data_table_config, PI.data_table_for(@resource, unquote(action)))
         |> assign(
           :live_action_config,
           Enum.find(

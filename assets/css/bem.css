@@ -14,3 +14,40 @@
 
 .pyro_ash_form_render_field__label {
 }
+
+/* FilterForm */
+.pyro_ash_filter_form {
+  @apply grid;
+}
+
+.pyro_ash_filter_form__form {
+  @apply grid;
+}
+
+.pyro_ash_filter_form__fieldset {
+  @apply grid rounded items-center content-start border border-slate-950/25 dark:border-slate-50/25 border-solid p-2 gap-2;
+}
+
+.pyro_ash_filter_form__legend {
+  @apply flex gap-2;
+}
+
+.pyro_ash_filter_form__legend_label {
+  @apply font-bold text-lg;
+}
+
+.pyro_ash_filter_form__input {
+  @apply !py-px;
+}
+
+.pyro_ash_filter_form__button {
+  @apply appearance-none rounded px-2 text-white bg-slate-500 hover:bg-slate-600 shadow border-none outline-none focus:ring font-bold py-1 text-sm cursor-pointer disabled:cursor-not-allowed;
+}
+
+.pyro_ash_filter_form__predicate {
+  @apply grid grid-cols-[auto,auto,1fr,auto] gap-2 items-center;
+}
+
+.pyro_ash_filter_form__predicate_left_fields {
+  @apply grid grid-flow-col gap-2;
+}

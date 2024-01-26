@@ -20,6 +20,7 @@ defmodule AshPyroComponents do
       import AshPyroComponents.Components.DataTable
       import AshPyroComponents.Components.Form
 
+      alias AshPyroComponents.Components.FilterForm, as: AshFilterForm
       alias AshPyroComponents.Components.Page, as: AshPage
     end
   end

@@ -55,7 +55,7 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :ci_string
+    attribute :name, :ci_string, allow_nil?: false
     attribute :position, :ci_string
     attribute :hired, AshPyroComponents.Type.ZonedDateTime, allow_nil?: false
   end

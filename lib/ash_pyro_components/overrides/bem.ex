@@ -57,4 +57,30 @@ defmodule AshPyroComponents.Overrides.BEM do
       get_nested(passed_assigns, [:field, :class])
     ]
   end
+
+  @prefixed_ash_filter_form_render @prefix <> "ash_filter_form"
+  override AshPyroComponents.Components.FilterForm, :render do
+    set :class, @prefixed_ash_filter_form_render
+    set :form_class, @prefixed_ash_filter_form_render <> "__form"
+    set :fieldset_class, @prefixed_ash_filter_form_render <> "__fieldset"
+    set :legend_class, @prefixed_ash_filter_form_render <> "__legend"
+    set :legend_label_class, @prefixed_ash_filter_form_render <> "__legend_label"
+    set :button_class, @prefixed_ash_filter_form_render <> "__button"
+    set :input_class, @prefixed_ash_filter_form_render <> "__input"
+  end
+
+  override AshPyroComponents.Components.FilterForm, :render_component do
+    set :fieldset_class, @prefixed_ash_filter_form_render <> "__fieldset"
+    set :legend_class, @prefixed_ash_filter_form_render <> "__legend"
+    set :legend_label_class, @prefixed_ash_filter_form_render <> "__legend_label"
+    set :button_class, @prefixed_ash_filter_form_render <> "__button"
+    set :input_class, @prefixed_ash_filter_form_render <> "__input"
+  end
+
+  override AshPyroComponents.Components.FilterForm, :render_predicate do
+    set :class, @prefixed_ash_filter_form_render <> "__predicate"
+    set :left_fields_class, @prefixed_ash_filter_form_render <> "__predicate_left_fields"
+    set :button_class, @prefixed_ash_filter_form_render <> "__button"
+    set :input_class, @prefixed_ash_filter_form_render <> "__input"
+  end
 end
