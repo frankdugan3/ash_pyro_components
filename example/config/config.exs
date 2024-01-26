@@ -16,7 +16,7 @@ config :ash_pyro_components_example, ash_apis: [AshPyroComponentsExample.Authent
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :pyro,
-  gettext: AshPyroComponentsExample.Gettext,
+  gettext: AshPyroComponentsExampleWeb.Gettext,
   overrides: [AshPyroComponents.Overrides.BEM, PyroComponents.Overrides.BEM]
 
 config :spark, :formatter,
