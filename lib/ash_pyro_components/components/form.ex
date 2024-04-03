@@ -324,11 +324,7 @@ defmodule AshPyroComponents.Components.Form do
          %{
            field: %AshPyro.Extensions.Resource.Form.Field{type: type},
            argument: %Ash.Resource.Actions.Argument{type: arg_type},
-           change: %{
-             type: Ash.Resource.Change.ManageRelationship,
-             manage_opts: %{on_lookup: {:relate, _, _}},
-             relationship: %{domain: domain}
-           }
+           change: %{type: Ash.Resource.Change.ManageRelationship, manage_opts: %{on_lookup: {:relate, _, _}}}
          } = assigns
        )
        when type in [:default, :autocomplete] and
@@ -341,18 +337,6 @@ defmodule AshPyroComponents.Components.Form do
                 Ash.Type.Integer,
                 Ash.Type.Map
               ] do
-    if is_nil(domain),
-      do:
-        raise("""
-        #{__MODULE__}.render_field/1:
-        - field name #{inspect(assigns.field.name)}
-        - field type #{inspect(assigns.field.type)}
-        - relationship #{inspect(assigns.change.relationship.name)} is missing domain
-
-        Add domain option to relationship:
-          domain: MyApp.MyDomain
-        """)
-
     ~H"""
     <.live_component
       module={PyroComponents.Components.Autocomplete}
@@ -384,7 +368,7 @@ defmodule AshPyroComponents.Components.Form do
                 @field.autocomplete_option_label_key
               ])
               |> Ash.Query.limit(10)
-              |> @change.relationship.domain.read!(actor: @actor)
+              |> Ash.read!(actor: @actor)
             end
 
           arg ->
@@ -394,7 +378,7 @@ defmodule AshPyroComponents.Components.Form do
                 @field.autocomplete_search_action,
                 Map.new([{arg, search}])
               )
-              |> @change.relationship.domain.read!(actor: @actor)
+              |> Ash.read!(actor: @actor)
             end
         end
       }
@@ -409,7 +393,7 @@ defmodule AshPyroComponents.Components.Form do
             @field.autocomplete_option_label_key,
             @field.autocomplete_option_label_key
           ])
-          |> @change.relationship.domain.read_one!(actor: @actor)
+          |> Ash.read_one!(actor: @actor)
         end
       }
     />
