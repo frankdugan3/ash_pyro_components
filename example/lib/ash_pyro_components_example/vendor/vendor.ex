@@ -1,6 +1,6 @@
 defmodule AshPyroComponentsExample.Vendor do
   @moduledoc false
-  use Ash.Api
+  use Ash.Domain
 
   authorization do
     authorize :by_default

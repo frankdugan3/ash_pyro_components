@@ -3,11 +3,8 @@ defmodule AshPyroComponentsExample.Authentication.Token do
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication.TokenResource],
-    authorizers: [Ash.Policy.Authorizer]
-
-  token do
-    api AshPyroComponentsExample.Authentication
-  end
+    authorizers: [Ash.Policy.Authorizer],
+  domain: AshPyroComponentsExample.Authentication
 
   postgres do
     table "tokens"

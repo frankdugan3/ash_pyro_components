@@ -132,8 +132,8 @@ defmodule AshPyroComponents.MixProject do
       {:ash_pyro, path: "../ash_pyro"},
       {:phoenix_live_view, "~> 0.20"},
       {:phoenix, "~> 1.7"},
-      {:ash, "~> 2.4"},
-      {:ash_phoenix, "~> 1.3"},
+      {:ash, "~> 3.0.0-rc.8"},
+      {:ash_phoenix, "~> 2.0.0-rc.2"},
       {:gettext, "~> 0.24", optional: true}
     ]
   end

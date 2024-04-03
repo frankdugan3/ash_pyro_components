@@ -4,27 +4,28 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshPyro.Extensions.Resource],
     authorizers: [Ash.Policy.Authorizer],
-    notifiers: [Ash.Notifier.PubSub]
+    notifiers: [Ash.Notifier.PubSub],
+    domain: AshPyroComponentsExample.Vendor
 
   pyro do
     live_view do
-      page "/employees", :employees, AshPyroComponentsExample.Vendor do
+      page "/employees", :employees do
         keep_live? true
 
         list "/", :index, :read do
           label "Employee Directory"
         end
 
-        show "/", :show, :read
         create "/create", :new, :create
         update "/edit", :edit, :update
+        show "/", :show, :read
       end
     end
 
     data_table do
       action :read do
         default_sort [:employer_name, :position, :name]
-        exclude [:employer, :id]
+        exclude [:employer, :id, :employer_id]
         column :employer_name, label: "Employer"
         column :position
         column :name
@@ -41,23 +42,24 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
 
         field :position
         field :hired
-        # field :employer do
-        #   type :autocomplete
-        # end
+        field :employer do
+          type :autocomplete
+          autocomplete_option_label_key :name
+        end
       end
     end
   end
 
   postgres do
     table "vendor_employees"
-    repo(AshPyroComponentsExample.Repo)
+    repo AshPyroComponentsExample.Repo
   end
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :ci_string, allow_nil?: false
-    attribute :position, :ci_string
-    attribute :hired, AshPyroComponents.Type.ZonedDateTime, allow_nil?: false
+    attribute :name, :ci_string, allow_nil?: false, public?: true
+    attribute :position, :ci_string, public?: true
+    attribute :hired, AshPyroComponents.Type.ZonedDateTime, allow_nil?: false, public?: true
   end
 
   identities do
@@ -65,14 +67,15 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
   end
 
   relationships do
-    belongs_to :employer, AshPyroComponentsExample.Vendor.Company, allow_nil?: false
+    belongs_to :employer, AshPyroComponentsExample.Vendor.Company, allow_nil?: false, public?: true
   end
 
   aggregates do
-    first :employer_name, :employer, :name
+    first :employer_name, :employer, :name, public?: true
   end
 
   actions do
+    default_accept [:name, :position, :hired]
     defaults [:destroy]
 
     read :read do
@@ -83,6 +86,7 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
         required? true
         offset? true
       end
+      prepare build(load: [:employer])
     end
 
     create :create do
@@ -95,6 +99,7 @@ defmodule AshPyroComponentsExample.Vendor.Employee do
     end
 
     update :update do
+      require_atomic? false
       argument :employer, :map, allow_nil?: false
 
       change manage_relationship(:employer,

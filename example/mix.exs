@@ -32,11 +32,11 @@ defmodule AshPyroComponentsExample.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:ash_authentication, "~> 3.12"},
-      {:ash_authentication_phoenix, "~> 1.9"},
-      {:ash_phoenix, "~> 1.2"},
-      {:ash_postgres, "~> 1.0"},
-      {:ash, "~> 2.4"},
+      {:ash_authentication, "~> 4.0.0-rc.2", override: true},
+      {:ash_authentication_phoenix, "~> 2.0.0-rc.1", override: true},
+      {:ash_phoenix, "~> 2.0.0-rc.2", override: true},
+      {:ash_postgres, "~> 2.0.0-rc.4", override: true},
+      {:ash, "~> 3.0.0-rc.9", override: true},
       {:bandit, "~> 1.0"},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},

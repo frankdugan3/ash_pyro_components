@@ -3,7 +3,9 @@ defmodule AshPyroComponentsExample.Authentication.User do
   use Ash.Resource,
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication],
-    authorizers: [Ash.Policy.Authorizer]
+    authorizers: [Ash.Policy.Authorizer],
+  domain: AshPyroComponentsExample.Authentication
+
 
   postgres do
     table "users"
@@ -11,7 +13,6 @@ defmodule AshPyroComponentsExample.Authentication.User do
   end
 
   authentication do
-    api AshPyroComponentsExample.Authentication
 
     strategies do
       password :password do
@@ -34,7 +35,7 @@ defmodule AshPyroComponentsExample.Authentication.User do
 
   attributes do
     uuid_primary_key :id
-    attribute :email, :ci_string, allow_nil?: false
+    attribute :email, :ci_string, allow_nil?: false, public?: true
     attribute :hashed_password, :string, allow_nil?: false, sensitive?: true
   end
 

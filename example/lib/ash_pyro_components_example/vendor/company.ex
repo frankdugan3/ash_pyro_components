@@ -4,7 +4,8 @@ defmodule AshPyroComponentsExample.Vendor.Company do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshPyro.Extensions.Resource],
     authorizers: [Ash.Policy.Authorizer],
-    notifiers: [Ash.Notifier.PubSub]
+    notifiers: [Ash.Notifier.PubSub],
+    domain: AshPyroComponentsExample.Vendor
 
   import Phoenix.Component, only: [sigil_H: 2]
 
@@ -12,7 +13,7 @@ defmodule AshPyroComponentsExample.Vendor.Company do
 
   pyro do
     live_view do
-      page "/companies", :companies, AshPyroComponentsExample.Vendor do
+      page "/companies", :companies do
         keep_live? true
 
         list "/", :index, :read do
@@ -69,14 +70,14 @@ defmodule AshPyroComponentsExample.Vendor.Company do
 
   postgres do
     table "vendor_companies"
-    repo(AshPyroComponentsExample.Repo)
+    repo AshPyroComponentsExample.Repo
   end
 
   attributes do
     uuid_primary_key :id
-    attribute :name, :ci_string
-    attribute :code, :ci_string
-    attribute :description, :ci_string
+    attribute :name, :ci_string, public?: true
+    attribute :code, :ci_string, public?: true
+    attribute :description, :ci_string, public?: true
   end
 
   identities do
@@ -85,10 +86,11 @@ defmodule AshPyroComponentsExample.Vendor.Company do
   end
 
   relationships do
-    has_many :employees, AshPyroComponentsExample.Vendor.Employee, destination_attribute: :employer_id
+    has_many :employees, AshPyroComponentsExample.Vendor.Employee, destination_attribute: :employer_id, public?: true
   end
 
   actions do
+    default_accept :*
     defaults [:create, :read, :update, :destroy]
   end
 

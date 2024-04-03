@@ -11,7 +11,7 @@ config :ash_pyro_components_example,
   ecto_repos: [AshPyroComponentsExample.Repo],
   generators: [timestamp_type: :utc_datetime]
 
-config :ash_pyro_components_example, ash_apis: [AshPyroComponentsExample.Authentication, AshPyroComponentsExample.Vendor]
+config :ash_pyro_components_example, ash_domains: [AshPyroComponentsExample.Authentication, AshPyroComponentsExample.Vendor]
 
 config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
