@@ -44,7 +44,7 @@ defmodule AshPyroComponentsExample.MixProject do
       {:finch, "~> 0.13"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
-      {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", app: false, compile: false, sparse: "optimized"},
+      {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.3", app: false, compile: false, sparse: "optimized"},
       {:jason, "~> 1.2"},
       {:phoenix_live_dashboard, "~> 0.8.2"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
