@@ -5,8 +5,10 @@ defmodule AshPyroComponents.Components.Form do
 
   use AshPyroComponents.Component
 
+  import Ash.Expr
+
   # import Pyro.Gettext
-  import PyroComponents.Components.Core, only: [button: 1, header: 1, input: 1]
+  import PyroComponents.Components.Core, only: [button: 1, header: 1, input: 1, modal: 1]
 
   alias Ash.Resource.Info, as: ResourceInfo
   alias AshPyro.Extensions.Resource.Info, as: PI
@@ -18,8 +20,11 @@ defmodule AshPyroComponents.Components.Form do
   """
 
   attr :overrides, :list, default: nil, doc: @overrides_attr_doc
+  attr :id, :string, required: true
+  attr :label, :string, default: nil, doc: "override the configured label for the form"
   attr :action_info, :any, default: :unassigned
   attr :pyro_form, :any, default: :unassigned
+  attr :return_to, :string, default: nil
   attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
   attr :for, :map, required: true, doc: "the datastructure for the form"
   attr :resource, :atom, required: true, doc: "the resource of the form"
@@ -33,7 +38,7 @@ defmodule AshPyroComponents.Components.Form do
     include: ~w(name rel action enctype method novalidate target),
     doc: "the arbitrary HTML attributes to apply to the form tag"
 
-  slot :actions, doc: "extra form actions"
+  # slot :actions, doc: "extra form actions"
 
   def ash_form(%{action_info: :unassigned, for: %{action: action}} = assigns) do
     assigns
@@ -59,45 +64,60 @@ defmodule AshPyroComponents.Components.Form do
     assigns = assign_overridables(assigns)
 
     ~H"""
-    <.form :let={f} class={@class} for={@for} as={@as} autocomplete={@autocomplete} {@rest}>
-      <.header overrides={@overrides}>
-        <%= @pyro_form.label %>
-        <:subtitle :if={@pyro_form.description || @action_info.description}>
-          <%= @pyro_form.description || @action_info.description %>
-        </:subtitle>
-      </.header>
+    <.modal id={@id} show={@for && @pyro_form} on_cancel={JS.patch(@return_to, replace: true)}>
+      <.form
+        :let={f}
+        :if={@pyro_form && @for}
+        class={@class}
+        for={@for}
+        as={@as}
+        autocomplete={@autocomplete}
+        phx-change="validate-ash-form"
+        phx-submit="submit-ash-form"
+        {@rest}
+      >
+        <.header overrides={@overrides}>
+          <%= @label || @pyro_form.label %>
+          <:subtitle :if={@pyro_form.description || @action_info.description}>
+            <%= @pyro_form.description || @action_info.description %>
+          </:subtitle>
+        </.header>
 
-      <%= for field <- @pyro_form.fields do %>
-        <.render_field
-          tz={@tz}
-          overrides={@overrides}
-          actor={@actor}
-          resource={@resource}
-          action_info={@action_info}
-          field={field}
-          form={f}
-        />
-      <% end %>
-
-      <section class={@actions_class}>
-        <%= for action <- @actions do %>
-          <%= render_slot(action, f) %>
+        <%= for field <- @pyro_form.fields do %>
+          <.render_field
+            tz={@tz}
+            overrides={@overrides}
+            actor={@actor}
+            resource={@resource}
+            action_info={@action_info}
+            field={field}
+            form={f}
+          />
         <% end %>
-        <.button
-          overrides={@overrides}
-          disabled={!f.source.changed?}
-          size="lg"
-          phx-click={"reset_#{f.name}"}
-          color="red"
-          confirm="Are you sure you want to reset the form?"
-        >
-          reset
-        </.button>
-        <.button overrides={@overrides} disabled={!f.source.valid?} size="lg" type="submit">
-          <%= if f.source.valid?, do: "Save", else: "Incomplete" %>
-        </.button>
-      </section>
-    </.form>
+
+        <section class={@actions_class}>
+          <%!-- <%= for action <- @actions do %>
+          <%= render_slot(action, f) %>
+        <% end %> --%>
+          <.button :if={@return_to} overrides={@overrides} patch={@return_to}>
+            Cancel
+          </.button>
+          <.button
+            overrides={@overrides}
+            disabled={!f.source.changed?}
+            phx-click="reset-ash-form"
+            phx-value-form-name={f.name}
+            color="red"
+            confirm="Are you sure you want to reset the form?"
+          >
+            Reset
+          </.button>
+          <.button overrides={@overrides} disabled={!f.source.valid?} type="submit">
+            <%= if f.source.valid?, do: "Save", else: "Incomplete" %>
+          </.button>
+        </section>
+      </.form>
+    </.modal>
     """
   end
 
@@ -307,7 +327,7 @@ defmodule AshPyroComponents.Components.Form do
            change: %{
              type: Ash.Resource.Change.ManageRelationship,
              manage_opts: %{on_lookup: {:relate, _, _}},
-             relationship: %{api: api}
+             relationship: %{domain: domain}
            }
          } = assigns
        )
@@ -318,18 +338,19 @@ defmodule AshPyroComponents.Components.Form do
                 Ash.Type.Binary,
                 Ash.Type.CiString,
                 Ash.Type.String,
-                Ash.Type.Integer
+                Ash.Type.Integer,
+                Ash.Type.Map
               ] do
-    if is_nil(api),
+    if is_nil(domain),
       do:
         raise("""
         #{__MODULE__}.render_field/1:
         - field name #{inspect(assigns.field.name)}
         - field type #{inspect(assigns.field.type)}
-        - relationship #{inspect(assigns.change.relationship.name)} is missing API
+        - relationship #{inspect(assigns.change.relationship.name)} is missing domain
 
-        Add API option to relationship:
-          api: MyApp.MyContext.Api
+        Add domain option to relationship:
+          domain: MyApp.MyDomain
         """)
 
     ~H"""
@@ -343,17 +364,38 @@ defmodule AshPyroComponents.Components.Form do
       label={@field.label}
       autofocus={@field.autofocus}
       prompt={@field.prompt}
+      type={if @argument.type == Ash.Type.Map, do: :map, else: :id}
       description={@field.description || @argument.description}
       option_label_key={@field.autocomplete_option_label_key}
       option_value_key={@field.autocomplete_option_value_key}
       search_fn={
-        fn search ->
-          @change.relationship.destination
-          |> Ash.Query.for_read(
-            @field.autocomplete_search_action,
-            Map.new([{@field.autocomplete_search_arg, search}])
-          )
-          |> @change.relationship.api.read!(actor: @actor)
+        case @field.autocomplete_search_arg do
+          nil ->
+            {_, _, lookup_action} = @change.manage_opts.on_lookup
+
+            fn search ->
+              label_key = @field.autocomplete_option_label_key
+
+              @change.relationship.destination
+              |> Ash.Query.for_read(lookup_action)
+              |> Ash.Query.filter(expr(contains(^ref(label_key), ^search)))
+              |> Ash.Query.load([
+                @field.autocomplete_option_label_key,
+                @field.autocomplete_option_label_key
+              ])
+              |> Ash.Query.limit(10)
+              |> @change.relationship.domain.read!(actor: @actor)
+            end
+
+          arg ->
+            fn search ->
+              @change.relationship.destination
+              |> Ash.Query.for_read(
+                @field.autocomplete_search_action,
+                Map.new([{arg, search}])
+              )
+              |> @change.relationship.domain.read!(actor: @actor)
+            end
         end
       }
       lookup_fn={
@@ -362,9 +404,12 @@ defmodule AshPyroComponents.Components.Form do
         fn value ->
           @change.relationship.destination
           |> Ash.Query.for_read(lookup_action)
-          |> Ash.Query.filter([{@field.autocomplete_option_value_key, value}])
-          |> Ash.Query.load([@field.autocomplete_option_label_key])
-          |> @change.relationship.api.read_one!(actor: @actor)
+          |> Ash.Query.filter([{@field.autocomplete_option_value_key, ^value}])
+          |> Ash.Query.load([
+            @field.autocomplete_option_label_key,
+            @field.autocomplete_option_label_key
+          ])
+          |> @change.relationship.domain.read_one!(actor: @actor)
         end
       }
     />
